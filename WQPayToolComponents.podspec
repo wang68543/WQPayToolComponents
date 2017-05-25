@@ -43,34 +43,38 @@ Pod::Spec.new do |s|
   s.prefix_header_contents = '#import <UIKit/UIKit.h>', '#import <Foundation/Foundation.h>'
 
 
-   s.subspec 'WeiXinSdk' do |ss|
-   ss.vendored_libraries = "WQPayToolComponents/WeiXinSdk/libWeChatSDK.a"
-   ss.source_files = "WQPayToolComponents/WeiXinSdk/*.h"
-   ss.libraries = "sqlite3"
+   s.subspec 'WQPaySDK' do |ss|
+       ss.subspec 'WeiXinSdk' do |sss|
+       sss.vendored_libraries = "WQPayToolComponents/WQPaySDK/WeiXinSdk/libWeChatSDK.a"
+       sss.source_files = "WQPayToolComponents/WQPaySDK/WeiXinSdk/*.h"
+       sss.libraries = "sqlite3"
+       end
+
+        ss.subspec 'AliPaySDK' do |sss|
+           #因为不知道怎么解决相对路径的问题 所以这里写成绝对路径
+        openssl_header_paths ='/Users/ggg/Desktop/Components/WQPayDemo/WQPayToolComponents/WQPaySDK/AliPaySDK' 
+        # openssl_header_paths = "$(SRCROOT)/WQBasicComponents/PaySDK/AliPaySDK"
+        # ss.user_target_xcconfig =  { 'HEADER_SEARCH_PATHS' => openssl_header_paths}
+       # ss.pod_target_xcconfig = { 'HEADER_SEARCH_PATHS' => '${}WQBasicComponents/PaySDK/AliPaySDK' }
+        #只有这个在pod对象里面才起作用 
+        sss.pod_target_xcconfig = { 'HEADER_SEARCH_PATHS' => openssl_header_paths } 
+            openssl_files = "WQPayToolComponents/WQPaySDK/AliPaySDK/openssl/*.h"
+            sss.subspec 'openssl' do |ssss|
+            ssss.source_files = openssl_files
+            end
+
+        sss.vendored_frameworks = 'WQPayToolComponents/WQPaySDK/AliPaySDK/AlipaySDK.framework'
+        sss.vendored_libraries = "WQPayToolComponents/WQPaySDK/AliPaySDK/libcrypto.a","WQPayToolComponents/WQPaySDK/AliPaySDK/libssl.a"
+        sss.resource = 'WQPayToolComponents/AliPaySDK/WQPaySDK/AlipaySDK.bundle'
+        sss.frameworks = 'SystemConfiguration','CoreTelephony','QuartzCore','CoreText','CoreGraphics','CFNetwork','CoreMotion'
+        sss.libraries = "c++", "z"
+        sss.source_files = 'WQPayToolComponents/WQPaySDK/AliPaySDK/*.{h,m}','WQPayToolComponents/WQPaySDK/AliPaySDK/Util/*.{h,m}'
    end
 
-   
-   #因为不知道怎么解决相对路径的问题 所以这里写成绝对路径
-    openssl_header_paths ='/Users/ggg/Desktop/Components/WQPayDemo/WQPayToolComponents/AliPaySDK' 
-    # openssl_header_paths = "$(SRCROOT)/WQBasicComponents/PaySDK/AliPaySDK"
-    # ss.user_target_xcconfig =  { 'HEADER_SEARCH_PATHS' => openssl_header_paths}
-   # ss.pod_target_xcconfig = { 'HEADER_SEARCH_PATHS' => '${}WQBasicComponents/PaySDK/AliPaySDK' }
-    #只有这个在pod对象里面才起作用 
-    s.pod_target_xcconfig = { 'HEADER_SEARCH_PATHS' => openssl_header_paths } 
-    s.subspec 'AliPaySDK' do |ss|
-
-    openssl_files = "WQPayToolComponents/AliPaySDK/openssl/*.h"
-    ss.subspec 'openssl' do |sss|
-    sss.source_files = openssl_files
-    end
-    ss.vendored_frameworks = 'WQPayToolComponents/AliPaySDK/AlipaySDK.framework'
-   
-    ss.vendored_libraries = "WQPayToolComponents/AliPaySDK/libcrypto.a","WQPayToolComponents/AliPaySDK/libssl.a"
-    ss.resource = 'WQPayToolComponents/AliPaySDK/AlipaySDK.bundle'
-    ss.frameworks = 'SystemConfiguration','CoreTelephony','QuartzCore','CoreText','CoreGraphics','CFNetwork','CoreMotion'
-    ss.libraries = "c++", "z"
-
-    ss.source_files = 'WQPayToolComponents/AliPaySDK/*.{h,m}','WQPayToolComponents/AliPaySDK/Util/*.{h,m}'
-   end
+ end
+ s.subspec 'WQPayTool' do |ss|
+  ss.dependency 'WQPayToolComponents/WQPaySDK'
+  ss.source_files = 'WQPayToolComponents/WQPayTool/*.{h,m}'
+ end
 
 end
