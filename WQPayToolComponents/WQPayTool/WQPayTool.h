@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "WQPayItem.h"
-
-static NSString *const kWeiXinAppId = @"wx550a40a0a6922cee";
+#import "WXApi.h"
+#import <AlipaySDK/AlipaySDK.h>
+static NSString *const kWeiXinAppId = @"";
 //
 typedef NS_ENUM(NSInteger , PayResultState){
     kPayDefault,
@@ -19,11 +20,17 @@ typedef NS_ENUM(NSInteger , PayResultState){
     kPayAppActiveWait,//app重新激活了 但是支付没有回调过来
 };
 @protocol WQPayToolDelegate <NSObject>
+
 -(void)payToolCompeletion:(WQPayItem *)item payState:(PayResultState)payState message:(NSString *)message;
 @end
 typedef void(^WQPayCompeletion)(PayResultState state , WQPayItem *payItem,NSString *errMsg);
 @interface WQPayTool : NSObject
-+(instancetype)payManager;
++(instancetype)manager;
+
+/** 发起支付 */
+-(void)wq_sendPay:(WQPayItem *)payItem delegate:(id<WQPayToolDelegate>)delegate;
+-(void)wq_sendPay:(WQPayItem *)payItem compeletion:(WQPayCompeletion)payComepeltion;
+
 /**
   *  用于处理appdelegate里面的回调
   *
@@ -34,7 +41,6 @@ typedef void(^WQPayCompeletion)(PayResultState state , WQPayItem *payItem,NSStri
   *  @return 是否处理  YES代表处理成功，NO代表不处理
   */
 //-(BOOL)handleOpenURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation;
--(BOOL)handleOpenURL:(NSURL *)url;
--(void)sendPay:(WQPayItem *)payItem delegate:(id<WQPayToolDelegate>)delegate;
--(void)sendPay:(WQPayItem *)payItem compeletion:(WQPayCompeletion)payComepeltion;
+-(BOOL)wq_handlePayOpenURL:(NSURL *)url;
+
 @end
